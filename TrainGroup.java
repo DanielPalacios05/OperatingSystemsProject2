@@ -20,6 +20,7 @@ public class TrainGroup  implements Runnable{
 
     public void initialize(){
         for (Train train : trains) {
+            
             Thread trainThread = new Thread(train);
             trainThread.start();
         }

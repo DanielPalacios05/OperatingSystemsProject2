@@ -32,7 +32,7 @@ public class BaseConciousRobot {
         return robot.getActualBeepers();
     }
 
-    public int capacity(){
+    public int getCapacity(){
         return robot.getCapacity();
     }
 
@@ -73,10 +73,9 @@ public class BaseConciousRobot {
         }
 
         ReentrantLock nextPosLock = lockMap[newPosY][newPosX];
-
-        nextPosLock.lock();
-
+       
         if(robot.frontIsClear()){
+            nextPosLock.lock();
             robot.move();
             if (actualPosLock.isHeldByCurrentThread()){
                 actualPosLock.unlock();
@@ -106,6 +105,14 @@ public class BaseConciousRobot {
 
     public void pickBeeper(){
         robot.pickBeeper();
+    }
+
+    public int getPosY(){
+        return this.posY;
+    }
+
+    public int getPosX(){
+        return this.posX;
     }
 
     public void pickBeeper(int times){
@@ -154,7 +161,7 @@ public class BaseConciousRobot {
         robot.turnOff();
     }
 
-    public boolean anyBeepersInBag(){
+    public boolean anyBeepersInBeeperBag(){
         return robot.anyBeepersInBeeperBag();
     }
 

@@ -5,11 +5,11 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class Miner extends BaseConciousRobot implements Directions,Runnable {
 
-    private ExchangePoint exchangePoint;
+    private ExchangePoint minerExchangePoint;
 
     public Miner(int street, int avenue, int beepers,Direction direction, int capacity, ReentrantLock[][] lockMap,ExchangePoint ep){
         super(new BaseRobot(street, avenue, direction, beepers, Color.BLACK, capacity, RobotState.INITIALIZING),lockMap,avenue,street);     
-        exchangePoint = ep;
+        minerExchangePoint = ep;
     }
 
 
@@ -18,7 +18,7 @@ public class Miner extends BaseConciousRobot implements Directions,Runnable {
         while (true) {
         mine();
         setState(RobotState.DROPING);
-        exchangePoint.dropToPoint(this);
+        minerExchangePoint.dropToPoint(this);
         goRest();
         }
     }
@@ -63,6 +63,8 @@ public class Miner extends BaseConciousRobot implements Directions,Runnable {
 
         // Exit Mine
         move(minerDepth);
+
+        
 
         mineLock.unlock();
     

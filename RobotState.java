@@ -4,5 +4,6 @@ public enum RobotState {
     DROPING,
     INITIALIZING,
     ON,
-    OFF;
+    OFF,
+    COLLECTING;
 }

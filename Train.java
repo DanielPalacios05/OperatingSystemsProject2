@@ -5,11 +5,12 @@ import kareltherobot.Directions;
 
 public class Train extends BaseConciousRobot implements Runnable,Directions{
 
-    private ExchangePoint exchangePoint;
-    
-    public Train(int street, int avenue, int beepers,Direction direction, int capacity, ReentrantLock[][] lockMap,ExchangePoint ep){
+    private ExchangePoint minerExchangePoint;
+    private ExchangePoint extractorExchangePoint;
+    public Train(int street, int avenue, int beepers,Direction direction, int capacity, ReentrantLock[][] lockMap,ExchangePoint mep,ExchangePoint eep){
         super(new BaseRobot(street, avenue, direction, beepers, Color.BLUE, capacity, RobotState.INITIALIZING),lockMap,avenue,street);
-        this.exchangePoint = ep;     
+        this.minerExchangePoint = mep;     
+        this.extractorExchangePoint = eep;
     }
 
     public void run(){
@@ -32,17 +33,44 @@ public class Train extends BaseConciousRobot implements Runnable,Directions{
         turnRight();
         move(4);
 
-        try {
-            exchangePoint.collectFromPoint(this);
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+
+        while(true){
+
+        if(this.getPosY() == 10 && this.getPosX() == 11 ){
+            minerExchangePoint.collectFromPoint(this);
+            turnRight();
+            releaseActualLock();
+            goForward();
+            turnRight();
+            goForward();
+            turnLeft();
+            goForward();
+            turnRight();
+            move();
+            extractorExchangePoint.dropToPoint(this);
+            turnLeft();
+            turnLeft();
+            releaseActualLock();
+            goForward();
+            turnLeft();
+            
+            move(6);
+
+            goForward();
+        
+
+        } 
+        else if(this.getPosY() == 10 && this.getPosX() == 7 && this.facingNorth()){
+            turnRight();
+            move();
+        }else{
+            move();
         }
-
-        turnRight();
-        goForward();
-
 
 
     }
+
+
+    }
+
 }
