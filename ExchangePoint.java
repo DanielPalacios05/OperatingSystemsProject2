@@ -7,6 +7,7 @@ public class ExchangePoint {
     private Condition canCollect;
     private Condition canEnter;
     private int beepersInPlace;
+    private boolean isAvailable;
 
     public ExchangePoint(ReentrantLock lock, int beepersInPlace){
         exchangePointLock = lock;
@@ -14,6 +15,7 @@ public class ExchangePoint {
         canEnter = queueLock.newCondition();
         canCollect = exchangePointLock.newCondition();
         this.beepersInPlace = beepersInPlace;
+        isAvailable = true;
     }
 
     public boolean areAnyBeepers(){
@@ -35,12 +37,12 @@ public class ExchangePoint {
     }
 
 
-    public void  collectFromPoint(BaseConciousRobot collectingRobot) {
+    public boolean collectFromPoint(BaseConciousRobot collectingRobot) {
 
         
-        exchangePointLock.lock();
-
+        if (isAvailable){
         try {
+            exchangePointLock.lock();
             if (beepersInPlace < 120){
                 canCollect.await();
             }
@@ -50,12 +52,18 @@ public class ExchangePoint {
                 collectingRobot.pickBeeper();
                 beepersInPlace--;
             }
-            System.out.println(beepersInPlace);
+            if (collectingRobot.getActualBeepers() == 0){
+                isAvailable = false;
+                System.out.println("Exchange not available");
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        return true;
+    }else{
+        return false;
+    }
 
-        
 
 
     }
@@ -75,11 +83,6 @@ public class ExchangePoint {
                 canEnter.signalAll();
                 queueLock.unlock();
             }
-
-
-        
-
-
     }
 
     public int getBeepersInPlace() {
@@ -87,9 +90,9 @@ public class ExchangePoint {
     }
 
     public void finish() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'finish'");
+    isAvailable = false;
     }
+
 
 
 }

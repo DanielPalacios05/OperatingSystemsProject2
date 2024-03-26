@@ -10,6 +10,8 @@ public class Extractor extends BaseConciousRobot implements Runnable {
 
 
     private int[] warehouse;
+    private ReentrantLock warehouseLock;
+    private ReentrantLock entryLock;
 
 
       public Extractor(int street, int avenue, int beepers,Direction direction, int capacity, ReentrantLock[][] lockMap,int pos, ExchangePoint ep,int[] wr){
@@ -17,6 +19,10 @@ public class Extractor extends BaseConciousRobot implements Runnable {
         this.extractorExchangePoint = ep;
         this.pos = pos;
         this.warehouse = wr;
+        warehouseLock = getLock(23, 23);
+        entryLock = getLock(20, 20);
+
+
     }
 
     public void run(){
@@ -39,15 +45,16 @@ public class Extractor extends BaseConciousRobot implements Runnable {
         
         move(5-pos);
         
+        turnLeft();
+        turnLeft();
+        
         try {
-            Thread.sleep(1000);
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
-        turnLeft();
-        turnLeft();
+
 
         boolean hasCollected = false;
         while (!hasCollected) {
@@ -63,6 +70,7 @@ public class Extractor extends BaseConciousRobot implements Runnable {
             turnRight();
             move();
             turnLeft();
+            warehouseLock.lock();
             move();
             turnRight();
             move();
@@ -71,18 +79,13 @@ public class Extractor extends BaseConciousRobot implements Runnable {
 
             turnLeft();
             move();
+            move();
+            warehouseLock.unlock();
             turnLeft();
 
             move(getPosX());
             turnRight();
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            
-            move(2+pos);
+            move(9+pos);
             turnRight();
             move();
             turnRight();
@@ -90,6 +93,7 @@ public class Extractor extends BaseConciousRobot implements Runnable {
             releaseActualLock();
 
         }else{
+        
             if(frontIsClear()){
                 move();
             }
@@ -103,13 +107,15 @@ public class Extractor extends BaseConciousRobot implements Runnable {
         turnLeft();
         for (int i = 0; i < warehouse.length; i++) {
             
-            if(warehouse[i] < 3000){
+            if(warehouse[i] < 300){
 
-                while (anyBeepersInBeeperBag() && warehouse[i] < 3000) {
+                while (anyBeepersInBeeperBag() && warehouse[i] < 300) {
                     putBeeper();
-                    warehouse[i]--;
+                    warehouse[i]++;
                 }
-            }else if(!anyBeepersInBeeperBag()){
+            }
+            
+            if(!anyBeepersInBeeperBag()){
                 break;
             }
             else{

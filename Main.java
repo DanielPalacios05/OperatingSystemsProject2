@@ -7,11 +7,48 @@ public class Main implements Directions{
 
     public static void main(String[] args) {
 
-        World.setTrace(false);
 
-        World.readWorld("Mina.kwld");
-        World.setVisible(true);
-        World.showSpeedControl(true);
+    int m = 0;
+    int t = 0;
+    int e = 0;
+    
+    // Process the arguments
+
+    if (args.length != 6) {
+        System.err.println("Error: No hay suficientes argumentos");
+        return;
+    }
+    for (int i = 0; i < args.length; i++) {
+        if (args[i].equals("-m")) {
+          m = Integer.parseInt(args[i + 1]);
+          if (m != 2) {
+            System.err.println("Error: m debe ser 2.");
+            return; // Exit program if m is less than 2
+          }
+        } else if (args[i].equals("-t")) {
+          t = Integer.parseInt(args[i + 1]);
+          if (t < 2 || t > 9) {  // Check for both minimum and maximum of t
+            System.err.println("Error: t must be between 0 and 9.");
+            return; // Exit program if t is invalid
+          }
+        } else if (args[i].equals("-e")) {
+          e = Integer.parseInt(args[i + 1]);
+          if (e < 2 || e > 5) {  // Check for both minimum and maximum of e
+            System.err.println("Error: e must be between 0 and 5.");
+            return; // Exit program if e is invalid
+          }
+        }
+      }
+  
+      // Use the parsed values (m, t, e) in your program logic (assuming they are valid now)
+      System.out.println("mineros: " + m + ", trenes: " + t + ", extractores: " + e);
+
+
+      World.setTrace(false);
+
+      World.readWorld("Mina.kwld");
+      World.setVisible(true);
+      World.showSpeedControl(true);
 
 
 
@@ -32,20 +69,22 @@ public class Main implements Directions{
 
         
 
-        int numTrains = 3;
-        int numExtractors = 2;
+        int numTrains = t;
+        int numExtractors = e;
+        int numMiners = m;
 
+        
         
         Miner leader = new Miner(9, 2, 0,South,50,lockMap,ep);
         Miner follower = new Miner(10, 2, 0, South,50, lockMap,ep);
         
         MinerGroup minerGroup = new MinerGroup(leader, follower);
         TrainGroup trainGroup = new TrainGroup();
-        ExtractorGroup extractorGroup = new ExtractorGroup(extractorExchangePoint);
+        ExtractorGroup extractorGroup = new ExtractorGroup(extractorExchangePoint,lockMap[22][22]);
 
                 
         for (int i = 0; i < numTrains; i++) {
-            Train newTrain = new Train(11+i, 2, 0, South, 120, lockMap,ep,extractorExchangePoint);
+            Train newTrain = new Train(11+i, 2, 0, South, 120, lockMap,ep,extractorExchangePoint,i);
             
             trainGroup.addTrain(newTrain);
             
@@ -61,14 +100,12 @@ public class Main implements Directions{
         
 
         
-        Thread  tr = new Thread(minerGroup);
-        
+    
 
         minerGroup.run();
-
         
         trainGroup.run();
-
+        
         extractorGroup.run();
 
 
