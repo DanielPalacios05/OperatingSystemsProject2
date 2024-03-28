@@ -75,12 +75,12 @@ public class Main implements Directions{
 
         
         
-        Miner leader = new Miner(9, 2, 0,South,50,lockMap,ep);
-        Miner follower = new Miner(10, 2, 0, South,50, lockMap,ep);
+        Miner leader = new Miner(9, 2, 0,South,50,lockMap,ep,true);
+        Miner follower = new Miner(10, 2, 0, South,50, lockMap,ep,false);
         
         MinerGroup minerGroup = new MinerGroup(leader, follower);
-        TrainGroup trainGroup = new TrainGroup();
-        ExtractorGroup extractorGroup = new ExtractorGroup(extractorExchangePoint,lockMap[22][22]);
+        TrainGroup trainGroup = new TrainGroup(extractorExchangePoint);
+        ExtractorGroup extractorGroup = new ExtractorGroup(extractorExchangePoint,lockMap[22][22],lockMap[25][25]);
 
                 
         for (int i = 0; i < numTrains; i++) {
@@ -90,7 +90,7 @@ public class Main implements Directions{
             
         }
         for (int i = 0; i < numExtractors; i++) {
-            Extractor newExtractor = new Extractor(12+numTrains+i, 2, 0, South, 120, lockMap,i,extractorExchangePoint,warehouse);
+            Extractor newExtractor = new Extractor(12+numTrains+i, 2, 0, South, 120, lockMap,i,extractorExchangePoint,warehouse,extractorGroup);
             
             extractorGroup.addExtractor(newExtractor);
         }
@@ -104,8 +104,9 @@ public class Main implements Directions{
 
         minerGroup.run();
         
-        trainGroup.run();
-        
+        Thread tr1 = new Thread(trainGroup);
+        tr1.start();
+
         extractorGroup.run();
 
 

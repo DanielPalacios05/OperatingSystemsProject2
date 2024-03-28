@@ -5,5 +5,5 @@ public enum RobotState {
     INITIALIZING,
     ON,
     OFF,
-    COLLECTING;
+    COLLECTING, FINISHED;
 }

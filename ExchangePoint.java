@@ -38,12 +38,9 @@ public class ExchangePoint {
 
 
     public boolean collectFromPoint(BaseConciousRobot collectingRobot) {
-
-        
-        if (isAvailable){
         try {
             exchangePointLock.lock();
-            if (beepersInPlace < 120){
+            if (beepersInPlace < 120 && isAvailable){
                 canCollect.await();
             }
             collectingRobot.move();
@@ -59,10 +56,8 @@ public class ExchangePoint {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return true;
-    }else{
-        return false;
-    }
+
+        return isAvailable;
 
 
 
@@ -91,6 +86,14 @@ public class ExchangePoint {
 
     public void finish() {
     isAvailable = false;
+    exchangePointLock.lock();
+    canCollect.signalAll();
+    exchangePointLock.unlock();
+
+    queueLock.lock();
+    canEnter.signalAll();
+    queueLock.unlock();
+    
     }
 
 

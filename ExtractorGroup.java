@@ -1,16 +1,25 @@
 import java.util.ArrayList;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
+
+
 
 public class ExtractorGroup  implements Runnable{
     private ArrayList<Extractor> extractors;
     private ExchangePoint extractorExchangePoint;
     private ArrayList<Thread> robotThreads;
     private ReentrantLock entryLock;
-    public ExtractorGroup(ExchangePoint exchangePoint,ReentrantLock entryLock){
+
+    private ReentrantLock allEnteredLock;
+    private Condition allEntered;
+
+    public ExtractorGroup(ExchangePoint exchangePoint,ReentrantLock entryLock, ReentrantLock allEnteredLock){
         extractors = new ArrayList<>();
         extractorExchangePoint = exchangePoint;
         robotThreads = new ArrayList<>();
         this.entryLock = entryLock;
+        this.allEnteredLock = allEnteredLock;
+        allEntered = allEnteredLock.newCondition();
     }
 
     public void addExtractor(Extractor extractor){
@@ -27,11 +36,14 @@ public class ExtractorGroup  implements Runnable{
             try {
                 do {
                 entryLock.lock();
-                initialize(); 
+                allEnteredLock.lock();
+                initialize();
+                allEntered.await();
+                allEnteredLock.unlock();
+                entryLock.unlock();
                 System.out.println("Esperando ultimo extractor");
                 robotThreads.get(0).join();
                 System.out.println("Esperando confirmacion de beepers");
-                entryLock.unlock();
             } while (extractorExchangePoint.areAnyBeepers());
                 
             } catch (InterruptedException e) {
@@ -44,6 +56,16 @@ public class ExtractorGroup  implements Runnable{
             robotThreads.set(i, new Thread(extractors.get(i)));
             robotThreads.get(i).start();
         }
+    }
+
+    public int getNumExtractors() {
+        return extractors.size();
+    }
+
+    public void signalAllEntered() {
+        allEnteredLock.lock();
+        this.allEntered.signalAll();
+        allEnteredLock.unlock();
     }
 
 

@@ -7,24 +7,31 @@ public class Miner extends BaseConciousRobot implements Directions,Runnable {
 
     private ExchangePoint minerExchangePoint;
     private ReentrantLock trainQueueLock; 
+    private boolean isLeader;
 
-    public Miner(int street, int avenue, int beepers,Direction direction, int capacity, ReentrantLock[][] lockMap,ExchangePoint ep){
+    public Miner(int street, int avenue, int beepers,Direction direction, int capacity, ReentrantLock[][] lockMap,ExchangePoint ep,boolean isLeader){
         super(new BaseRobot(street, avenue, direction, beepers, Color.BLACK, capacity, RobotState.INITIALIZING),lockMap,avenue,street);     
         minerExchangePoint = ep;
         trainQueueLock = getLock(26, 26);
+        this.isLeader = isLeader;
     }
 
 
     public void run(){
         lockActualPosition();
-        while (true) {
+        while (getState() != RobotState.FINISHED) {
         boolean hasMined = mine();
+
+        if(hasMined){
         setState(RobotState.DROPING);
         minerExchangePoint.dropToPoint(this);
-        if(hasMined){
         goRest();
         }else{
             exitMine();
+            setState(RobotState.FINISHED);
+            if(!isLeader){
+                minerExchangePoint.finish();
+            }
             break;
         }
         }
@@ -34,7 +41,6 @@ public class Miner extends BaseConciousRobot implements Directions,Runnable {
     public void exitMine() {
         ReentrantLock entryLock = getLock(22, 22);
         turnLeft();
-        minerExchangePoint.finish();
         goForward();
         turnRight();
         goForward();
@@ -56,7 +62,13 @@ public class Miner extends BaseConciousRobot implements Directions,Runnable {
         move(3);
         entryLock.unlock();
         turnLeft();
-        move(4);
+        
+        if(isLeader){
+            move(4);
+        }else{
+            move(3);
+        }
+       
 
         
     }
