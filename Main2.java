@@ -1,7 +1,9 @@
+import java.awt.Color;
+import java.util.Enumeration;
+import java.util.Vector;
 import java.util.concurrent.locks.ReentrantLock;
 
-import kareltherobot.Directions;
-import kareltherobot.World;
+import kareltherobot.*;
 
 public class Main2 implements Directions{
 
@@ -9,57 +11,20 @@ public class Main2 implements Directions{
 
         World.setTrace(false);
 
-        World.readWorld("Mina.kwld");
+        World.readWorld("Mina2.kwld");
         World.setVisible(true);
-        World.showSpeedControl(true);
 
+        Robot foo = new Robot(9, 9, East, 0,Color.BLACK);
+        Robot var = new Robot(8, 9, East, 0,Color.BLUE);
+        Robot se = new Robot(7, 9, North, 0,Color.RED);
 
+        se.move();
 
-        ReentrantLock[][] lockMap = new ReentrantLock[30][30];
-        
-        
-        for (int i = 0; i < lockMap.length; i++) {
-            for (int j = 0; j < lockMap.length; j++) {
-                lockMap[i][j] = new ReentrantLock();
-            }
+        Enumeration a = var.neighbors();
+
+        while (a.hasMoreElements()) {
+             ((Robot)a.nextElement()).turnOff();
         }
-        TrainGroup trainGroup = new TrainGroup();
-        ExtractorGroup extractorGroup = new ExtractorGroup();
-        int numTrains = 9;
-        int numExtractors = 5;
-
-        ExchangePoint ep = new ExchangePoint(lockMap[10][12], 0);
-        ExchangePoint extractorExchangePoint = new ExchangePoint(lockMap[0][1], 0);
-
-
-
-
-        for (int i = 0; i < numTrains; i++) {
-            Train newTrain = new Train(11+i, 2, 0, South, 120, lockMap,ep,extractorExchangePoint);
-            
-            trainGroup.addTrain(newTrain);
-
-
-        }
-
-        for (int i = 0; i < numExtractors; i++) {
-            Extractor newExtractor = new Extractor(12+numTrains+i, 2, 0, South, 120, lockMap,i);
-            
-            extractorGroup.addExtractor(newExtractor);
-            
-        }
-
-       
-        
-        Thread tr2 = new Thread(trainGroup);
-        tr2.start();
-
-        Thread tr3 = new Thread(extractorGroup);
-        tr3.start();
-
-
-
-
     }
     
 }

@@ -63,8 +63,8 @@ public class Main implements Directions{
             }
         }
 
-        ExchangePoint ep = new ExchangePoint(lockMap[10][12], 0);
-        ExchangePoint extractorExchangePoint = new ExchangePoint(lockMap[0][1], 0);
+        ExchangePoint ep = new ExchangePoint(lockMap[10][12], 0,120);
+        ExchangePoint extractorExchangePoint = new ExchangePoint(lockMap[0][1], 0,50);
         int[] warehouse = new int[5];
 
         
@@ -90,7 +90,7 @@ public class Main implements Directions{
             
         }
         for (int i = 0; i < numExtractors; i++) {
-            Extractor newExtractor = new Extractor(12+numTrains+i, 2, 0, South, 120, lockMap,i,extractorExchangePoint,warehouse,extractorGroup);
+            Extractor newExtractor = new Extractor(12+numTrains+i, 2, 0, South, 50, lockMap,i,extractorExchangePoint,warehouse,extractorGroup);
             
             extractorGroup.addExtractor(newExtractor);
         }

@@ -8,14 +8,16 @@ public class ExchangePoint {
     private Condition canEnter;
     private int beepersInPlace;
     private boolean isAvailable;
+    private int collectorsCapacity;
 
-    public ExchangePoint(ReentrantLock lock, int beepersInPlace){
+    public ExchangePoint(ReentrantLock lock, int beepersInPlace,int collectorsCapacity){
         exchangePointLock = lock;
         queueLock = new ReentrantLock();
         canEnter = queueLock.newCondition();
         canCollect = exchangePointLock.newCondition();
         this.beepersInPlace = beepersInPlace;
         isAvailable = true;
+        this.collectorsCapacity = collectorsCapacity;
     }
 
     public boolean areAnyBeepers(){
@@ -40,7 +42,7 @@ public class ExchangePoint {
     public boolean collectFromPoint(BaseConciousRobot collectingRobot) {
         try {
             exchangePointLock.lock();
-            if (beepersInPlace < 120 && isAvailable){
+            if (beepersInPlace < collectorsCapacity && isAvailable){
                 canCollect.await();
             }
             collectingRobot.move();
@@ -72,7 +74,7 @@ public class ExchangePoint {
             droppingRobot.dropBeepers();
             beepersInPlace += beepersToDrop;
 
-            if (beepersInPlace >= 120 || beepersToDrop < droppingRobot.getCapacity() ){
+            if (beepersInPlace >= collectorsCapacity || beepersToDrop < droppingRobot.getCapacity() ){
                 canCollect.signalAll();
                 queueLock.lock();
                 canEnter.signalAll();

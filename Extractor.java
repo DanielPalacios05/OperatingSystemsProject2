@@ -93,7 +93,7 @@ public class Extractor extends BaseConciousRobot implements Runnable {
 
             move(getPosX());
             turnRight();
-            move(9+pos);
+            move(4+pos);
             turnRight();
             move();
             turnRight();

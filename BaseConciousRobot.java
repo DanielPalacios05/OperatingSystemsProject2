@@ -82,6 +82,10 @@ public class BaseConciousRobot {
             }
             
             if(robot.nextToARobot()){
+                Enumeration neighborRobots = robot.neighbors();
+                while (neighborRobots.hasMoreElements()) {
+                    ((Robot)neighborRobots.nextElement()).turnOff();
+                }
                 robot.turnOff();
             }
 
